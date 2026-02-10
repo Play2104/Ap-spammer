@@ -1,0 +1,93 @@
+-- Services
+local Players = game:GetService("Players")
+local TextChatService = game:GetService("TextChatService")
+local LocalPlayer = Players.LocalPlayer
+
+-- GUI
+local gui = Instance.new("ScreenGui")
+gui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+
+local frame = Instance.new("Frame")
+frame.Parent = gui
+frame.Size = UDim2.new(0, 320, 0, 420)
+frame.Position = UDim2.new(0, 20, 0.5, -210)
+frame.BackgroundColor3 = Color3.fromRGB(180, 0, 0)
+frame.BorderSizePixel = 0
+
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 12)
+corner.Parent = frame
+
+-- TITRE
+local title = Instance.new("TextLabel")
+title.Parent = frame
+title.Size = UDim2.new(1, 0, 0, 45)
+title.BackgroundTransparency = 1
+title.Text = "Hlx Ap"
+title.TextColor3 = Color3.new(1, 1, 1)
+title.Font = Enum.Font.GothamBlack
+title.TextScaled = true
+
+-- Layout
+local layout = Instance.new("UIListLayout")
+layout.Parent = frame
+layout.Padding = UDim.new(0, 6)
+layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+
+-- Fonction envoi message
+local function sendMessage(msg)
+	if TextChatService.ChatVersion == Enum.ChatVersion.TextChatService then
+		local channel = TextChatService.TextChannels.RBXGeneral
+		if channel then
+			channel:SendAsync(msg)
+		end
+	end
+end
+
+-- Commandes (ultra rapide)
+local function punishPlayer(playerName)
+	local commands = {
+		";jumpscare " .. playerName,
+		";morph " .. playerName,
+		";tiny " .. playerName,
+		";rocket " .. playerName,
+		";jail " .. playerName,
+		";ragdoll " .. playerName,
+		";inverse " .. playerName
+	}
+
+	for _, cmd in ipairs(commands) do
+		sendMessage(cmd)
+		task.wait(0.01)
+	end
+end
+
+-- Bouton joueur
+local function createPlayerButton(player)
+	local button = Instance.new("TextButton")
+	button.Parent = frame
+	button.Size = UDim2.new(1, -16, 0, 42)
+	button.BackgroundColor3 = Color3.fromRGB(255, 60, 60)
+	button.TextColor3 = Color3.new(1, 1, 1)
+	button.TextScaled = true
+	button.Font = Enum.Font.GothamBold
+	button.Text = "@" .. player.Name
+
+	local btnCorner = Instance.new("UICorner")
+	btnCorner.CornerRadius = UDim.new(0, 8)
+	btnCorner.Parent = button
+
+	button.MouseButton1Click:Connect(function()
+		punishPlayer(player.Name)
+	end)
+end
+
+-- Joueurs présents
+for _, player in pairs(Players:GetPlayers()) do
+	createPlayerButton(player)
+end
+
+-- Nouveaux joueurs
+Players.PlayerAdded:Connect(function(player)
+	createPlayerButton(player)
+end)
