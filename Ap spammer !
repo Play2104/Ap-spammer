@@ -1,93 +1,65 @@
 -- Services
 local Players = game:GetService("Players")
 local TextChatService = game:GetService("TextChatService")
+local UIS = game:GetService("UserInputService")
 local LocalPlayer = Players.LocalPlayer
 
 -- GUI
 local gui = Instance.new("ScreenGui")
 gui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
-local frame = Instance.new("Frame")
-frame.Parent = gui
-frame.Size = UDim2.new(0, 320, 0, 420)
-frame.Position = UDim2.new(0, 20, 0.5, -210)
-frame.BackgroundColor3 = Color3.fromRGB(180, 0, 0)
-frame.BorderSizePixel = 0
+local main = Instance.new("Frame")
+main.Parent = gui
+main.Size = UDim2.new(0, 340, 0, 420)
+main.Position = UDim2.new(0.1, 0, 0.3, 0)
+main.BackgroundColor3 = Color3.fromRGB(170, 0, 0)
+main.BorderSizePixel = 0
+main.Active = true
 
-local corner = Instance.new("UICorner")
+local corner = Instance.new("UICorner", main)
 corner.CornerRadius = UDim.new(0, 12)
-corner.Parent = frame
 
--- TITRE
+-- TITRE (sert aussi pour déplacer)
 local title = Instance.new("TextLabel")
-title.Parent = frame
+title.Parent = main
 title.Size = UDim2.new(1, 0, 0, 45)
-title.BackgroundTransparency = 1
-title.Text = "Hlx Ap"
-title.TextColor3 = Color3.new(1, 1, 1)
+title.BackgroundColor3 = Color3.fromRGB(140, 0, 0)
+title.Text = "Hlx ap"
+title.TextColor3 = Color3.new(1,1,1)
 title.Font = Enum.Font.GothamBlack
 title.TextScaled = true
+title.BorderSizePixel = 0
 
--- Layout
-local layout = Instance.new("UIListLayout")
-layout.Parent = frame
+local titleCorner = Instance.new("UICorner", title)
+titleCorner.CornerRadius = UDim.new(0, 12)
+
+-- SCROLL
+local scroll = Instance.new("ScrollingFrame")
+scroll.Parent = main
+scroll.Position = UDim2.new(0, 0, 0, 50)
+scroll.Size = UDim2.new(1, 0, 1, -55)
+scroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+scroll.ScrollBarImageTransparency = 0.2
+scroll.BorderSizePixel = 0
+scroll.BackgroundTransparency = 1
+scroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
+
+local layout = Instance.new("UIListLayout", scroll)
 layout.Padding = UDim.new(0, 6)
 layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 
--- Fonction envoi message
-local function sendMessage(msg)
-	if TextChatService.ChatVersion == Enum.ChatVersion.TextChatService then
-		local channel = TextChatService.TextChannels.RBXGeneral
-		if channel then
-			channel:SendAsync(msg)
-		end
+-- Drag (déplacement)
+local dragging, dragStart, startPos
+
+title.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = true
+		dragStart = input.Position
+		startPos = main.Position
 	end
-end
-
--- Commandes (ultra rapide)
-local function punishPlayer(playerName)
-	local commands = {
-		";jumpscare " .. playerName,
-		";morph " .. playerName,
-		";tiny " .. playerName,
-		";rocket " .. playerName,
-		";jail " .. playerName,
-		";ragdoll " .. playerName,
-		";inverse " .. playerName
-	}
-
-	for _, cmd in ipairs(commands) do
-		sendMessage(cmd)
-		task.wait(0.01)
-	end
-end
-
--- Bouton joueur
-local function createPlayerButton(player)
-	local button = Instance.new("TextButton")
-	button.Parent = frame
-	button.Size = UDim2.new(1, -16, 0, 42)
-	button.BackgroundColor3 = Color3.fromRGB(255, 60, 60)
-	button.TextColor3 = Color3.new(1, 1, 1)
-	button.TextScaled = true
-	button.Font = Enum.Font.GothamBold
-	button.Text = "@" .. player.Name
-
-	local btnCorner = Instance.new("UICorner")
-	btnCorner.CornerRadius = UDim.new(0, 8)
-	btnCorner.Parent = button
-
-	button.MouseButton1Click:Connect(function()
-		punishPlayer(player.Name)
-	end)
-end
-
--- Joueurs présents
-for _, player in pairs(Players:GetPlayers()) do
-	createPlayerButton(player)
-end
-
--- Nouveaux joueurs
-Players.PlayerAdded:Connect(function(player)
-	createPlayerButton(player)
 end)
+
+title.InputEnded:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = false
+	end
